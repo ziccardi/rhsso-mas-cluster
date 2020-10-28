@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# --cluster-name|n xxx --ocm-token|t xxx --aws-account-id|i xxx --aws-access-key-id|k xxx --aws-access-key-secret|s xxx
 set -e
 CMD=$(basename "$0")
 
