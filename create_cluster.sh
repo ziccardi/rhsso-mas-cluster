@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+#set -e
 CMD=$(basename "$0")
 
 function print_usage {
@@ -51,6 +51,12 @@ do
   esac
 done
 shift $(expr $OPTIND - 1)
+
+if ! [ -x "$(command -v ocm)" ]; then
+  echo 'Error: ocm is not installed.' >&2
+  echo 'Download from https://github.com/openshift-online/ocm-cli/releases and put it into your PATH' >&2
+  exit 1
+fi
 
 if [ -z "${OCM_TOKEN}" ]; then
   printf "OCM TOKEN CAN BE FOUND HERE: https://qaprodauth.cloud.redhat.com/openshift/token\n"
