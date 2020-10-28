@@ -110,14 +110,14 @@ printf "%s\n" "{\
 STATUS="pending"
 while [ "$STATUS" != "ready" ]
 do
-  STATUS="$(ocm list clusters | tail -1 | awk '{print $8}')"
+  STATUS="$(ocm list clusters | grep "'$CLUSTER_NAME'" | awk '{print $8}')"
 	for s in / - \\ \|; do
 		printf "\r$s Waiting for the cluster to start (current status: %s)" "$STATUS"
 		sleep .1
 	done
 done
 
-CLUSTER_ID=$(ocm list clusters | grep "$CLUSTER_NAME" | awk '{print $1}')
+CLUSTER_ID=$(ocm list clusters | grep "$CLUSTER_NAME" | tail -1 | awk '{print $1}')
 API_URL=$(ocm describe cluster "$CLUSTER_ID" | grep 'API URL' | awk '{print $3}')
 CONSOLE_URL=$(ocm describe cluster "$CLUSTER_ID" | grep 'Console URL' | awk '{print $3}')
 OC_USER=$(ocm get /api/clusters_mgmt/v1/clusters/$CLUSTER_ID/credentials | grep '"user"' | awk '{print $2}' | sed -e 's/[\",]//g')
