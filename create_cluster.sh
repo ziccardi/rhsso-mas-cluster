@@ -4,23 +4,26 @@
 CMD=$(basename "$0")
 
 function print_usage {
-  printf "usage: '%s' %s\n%s\n%s\n\n" \
+  printf "usage: '%s' %s\n%s\n%s\n%s\n\n" \
     "$CMD" \
-     "[-t | --ocm-token <TOKEN>] [-n | --cluster-name]" \
-     "                           [-i | --aws-account-id] [-k | --aws-access-key-id]" \
-     "                           [-s | --aws-access-key-secret]"
+     "[-t | --ocm-token <TOKEN>] [-n | --cluster-name <name>]" \
+     "                           [-i | --aws-account-id <account id>] [-k | --aws-access-key-id <key-id>]" \
+     "                           [-s | --aws-access-key-secret <key secret>]" \
+     "                           [-d | --deploy-rh-sso <namespace>]"
 
   printf "[-t|--ocm-token] the token to be used to access ocm. You can copy it from\n%s\n%s\n" \
     "                 https://qaprodauth.cloud.redhat.com/openshift/token" \
     "                 ENV VAR: OCM_TOKEN"
   printf "[-n|--cluster-name] the name of the cluster to be created.\n%s\n" \
     "                 ENV VAR: CLUSTER_NAME"
-  printf "[-i | --aws-account-id] the AWS account id.\n%s\n" \
+  printf "[-i|--aws-account-id] the AWS account id.\n%s\n" \
     "                 ENV VAR: AWS_ACCOUNT_ID"
-  printf "[-k | --aws-access-key-id] the AWS access key id.\n%s\n" \
+  printf "[-k|--aws-access-key-id] the AWS access key id.\n%s\n" \
     "                 ENV VAR: AWS_ACCESS_KEY_ID"
-  printf "[-s | --aws-access-key-secret] the AWS access key secret.\n%s\n" \
+  printf "[-s|--aws-access-key-secret] the AWS access key secret.\n%s\n" \
     "                 ENV VAR: AWS_ACCESS_KEY_SECRET"
+  printf "[-d|--deploy-rh-sso <namespace>] specify this if you want to deploy RH-SSO as soon as the cluster is\n%s" \
+    "                 ready.\n" \
 
 }
 
@@ -33,12 +36,13 @@ for arg in "$@"; do
     "--aws-account-id")   set -- "$@" "-i" ;;
     "--aws-access-key-id")   set -- "$@" "-k" ;;
     "--aws-access-key-secret")   set -- "$@" "-s" ;;
+    "--deploy-rh-sso")   set -- "$@" "-d" ;;
     *)        set -- "$@" "$arg"
   esac
 done
 
 OPTIND=1
-while getopts ht:n:i:k:s: opt
+while getopts ht:n:i:k:s:d: opt
 do
   case "$opt" in
     "h") print_usage; exit 0 ;;
@@ -47,6 +51,7 @@ do
     "i") AWS_ACCOUNT_ID=${OPTARG} ;;
     "k") AWS_ACCESS_KEY_ID=${OPTARG} ;;
     "s") AWS_ACCESS_KEY_SECRET=${OPTARG} ;;
+    "d") DEPLOY_SSO=${OPTARG} ;;
     "?") print_usage >&2; exit 1 ;;
   esac
 done
@@ -125,3 +130,9 @@ echo "CONSOLE URL: $CONSOLE_URL"
 echo "USER: $OC_USER"
 echo "PASSWORD: $OC_PASSWD"
 echo "**********************************************"
+
+if [ -n "${DEPLOY_SSO}" ]; then
+  printf "DEPLOYING RH-SSO\n"
+  NAMESPACE=$DEPLOY_SSO
+  . ./deploy_rhsso.sh
+fi

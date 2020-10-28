@@ -16,6 +16,9 @@ To create a cluster, the script will require the following data:
 * The AWS access key secret. This can be specified either by setting the `AWS_ACCESS_KEY_SECRET` environment variable
   or by specifying the `-s|--aws-access-key-secret` parameter.
 
+Finally, if you want RH-SSO to be deployed as soon as the cluster is ready, pass the `-d|--deploy-rh-sso <namespace>`
+parameter.
+
 If any of the required parameter is not specified, the script prompt for a value.
 
 An example invocation could be:
